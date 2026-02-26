@@ -176,20 +176,39 @@ Edit `~/.config/quickshell/overview/common/Appearance.qml` to customize:
 - Font families and sizes  
 - Animation curves and durations
 - Border radius values
-##### Use matugen generated colors 
-  - add the below config to `config.toml` in matugen config 
+
+### Matugen (Dynamic Colors from Wallpaper)
+
+[Matugen](https://github.com/InioX/matugen) lets you generate Material You colors from your wallpaper and apply them to the overview automatically.
+
+**1. Install matugen** - follow [matugen's install guide](https://github.com/InioX/matugen?tab=readme-ov-file#installation)
+
+**2. Copy the template** from this repo to matugen's templates folder:
+```bash
+mkdir -p ~/.config/matugen/templates
+cp ~/.config/quickshell/overview/quickshell-overview.qml ~/.config/matugen/templates/
+```
+
+**3. Add this to `~/.config/matugen/config.toml`** (create the file if it doesn't exist):
 ```toml
-  [templates.quickshell_overview]
-  input_path  = "~/.config/matugen/templates/quickshell-overview.qml"
-  output_path = "~/.config/quickshell/overview/common/Appearance.colors.qml"
+[templates.quickshell_overview]
+input_path  = "./templates/quickshell-overview.qml"
+output_path = "~/.config/quickshell/overview/common/Appearance.colors.qml"
 ```
-  - paste this [matugen overview template](./quickshell-overview.qml) into your `matugen/templates/` folder
-  - Now set the below show property to `true` in `common/Appearance.qml`
+
+**4. Enable it** in `~/.config/quickshell/overview/common/Config.qml`:
 ```qml
- property QtObject appearance: QtObject {
-            property bool useMatugenColors: false   // change to true to use matugen colors 
-        }
+property QtObject appearance: QtObject {
+    property bool useMatugenColors: true  // change from false to true
+}
 ```
+
+**5. Run matugen** with your wallpaper to generate colors:
+```bash
+matugen image /path/to/your/wallpaper.jpg
+```
+
+This generates `Appearance.colors.qml` which the overview loads automatically. Re-run step 5 whenever you change your wallpaper.
 
 ---
 
