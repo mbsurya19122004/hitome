@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import "../../common"
 import "../../common/functions"
 import "../../services"
@@ -34,6 +35,7 @@ Item { // Window
     property bool compactMode: Appearance.font.pixelSize.smaller * 4 > targetWindowHeight || Appearance.font.pixelSize.smaller * 4 > targetWindowWidth
 
     property bool indicateXWayland: windowData?.xwayland ?? false
+    property bool previewCaptureEnabled: true
     
     x: initX
     y: initY
@@ -59,7 +61,7 @@ Item { // Window
     ScreencopyView {
         id: windowPreview
         anchors.fill: parent
-        captureSource: GlobalStates.overviewOpen ? root.toplevel : null
+        captureSource: GlobalStates.overviewOpen && root.previewCaptureEnabled ? root.toplevel : null
         live: true
 
         Rectangle {
@@ -95,6 +97,34 @@ Item { // Window
                 Behavior on height {
                     animation: Appearance.animation.elementMoveEnter.numberAnimation.createObject(this)
                 }
+            }
+        }
+    }
+
+    function refreshCapture() {
+        if (!GlobalStates.overviewOpen)
+            return;
+
+        root.previewCaptureEnabled = false;
+        previewResetTimer.restart();
+    }
+
+    Timer {
+        id: previewResetTimer
+        interval: 60
+        repeat: false
+        onTriggered: root.previewCaptureEnabled = true
+    }
+
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (!GlobalStates.overviewOpen)
+                return;
+
+            const eventName = `${event?.name ?? event?.event ?? event?.type ?? ""}`;
+            if (eventName === "closewindow" || eventName === "openwindow" || eventName === "movewindow") {
+                root.refreshCapture();
             }
         }
     }
