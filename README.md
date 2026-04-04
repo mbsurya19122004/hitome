@@ -130,6 +130,7 @@ home.packages = with pkgs; [
 | **Arrow Keys / h/l** | Navigate left/right within current row* |
 | **Up/Down / j/k** | Navigate between workspace rows |
 | **1-9, 0** | Jump to Nth workspace in current group (0 = 10th) |
+| **Mouse wheel on grid** | Move across all normal workspaces, wrapping from last to first |
 | **Escape / Enter** | Close the overview |
 | **Click workspace** | Switch to that workspace |
 | **Click window** | Focus that window |
@@ -186,6 +187,9 @@ Edit `~/.config/quickshell/overview/config.json`:
     "previewMode": "live",
     "includeInactiveMonitorPreviews": true,
     "previewRecaptureDelayMs": 60,
+    "showSpecialWorkspaces": true,
+    "specialWorkspaces": [],
+    "specialWorkspaceColumns": 5,
     "effects": {
       "enableBackdrop": false,
       "backdropOpacity": 0.28,
@@ -211,6 +215,7 @@ Edit `~/.config/quickshell/overview/config.json`:
 - **More workspaces?** Change `rows` and `columns` (e.g., 3 rows × 4 columns = 12 workspaces)
 - **Reverse order?** Set `orderRightLeft` and/or `orderBottomUp` to `true`
 - **Per-monitor workspace groups?** Enable `useWorkspaceMap` and set `workspaceMap` (e.g. `[0,10]`)
+- **Show special workspaces below grid?** Keep `showSpecialWorkspaces: true` and optionally prefill `specialWorkspaces`
 - **Lower memory use?** Set `previewMode` to `event` and `includeInactiveMonitorPreviews` to `false`
 - **Transparency / blur?** Tune `overview.effects.*` (details below)
 
@@ -269,6 +274,34 @@ Increase `topMargin` to move the overview down. Decrease it to move up.
 - `overview.includeInactiveMonitorPreviews`: when `false`, only current monitor windows get preview capture
 - `overview.previewRecaptureDelayMs`: delay used for event-mode snapshot refresh (lower = faster updates)
 - `hacks.hyprlandEventDebounceMs`: coalesces Hyprland event refreshes to reduce command churn
+
+### Special Workspaces
+
+```json
+{
+  "overview": {
+    "showSpecialWorkspaces": true,
+    "specialWorkspaces": ["communication", "music"],
+    "specialWorkspaceColumns": 5
+  }
+}
+```
+
+- `showSpecialWorkspaces`: renders special workspaces in a strip under the normal grid
+- `specialWorkspaces`: optional preconfigured special workspace names (without `special:` prefix)
+- `specialWorkspaceColumns`: how many special tiles per row before wrapping
+
+Interaction behavior:
+- The special strip shows active special workspaces plus any names you preconfigure
+- Click a special tile to run `togglespecialworkspace <name>`
+- Click the `+` tile to create and open a new special workspace
+- Drag a window onto a special tile to move it with `movetoworkspacesilent special:<name>`
+- Drag a window onto the `+` tile to auto-create a new special workspace (`stash`, `stash-2`, ...), even when no special workspace is currently open
+- Special windows are visible directly in those tiles
+
+Normal workspace scrolling:
+- Scroll on the normal workspace grid to move the active workspace/highlighter across all normal workspaces
+- Scrolling wraps from the last workspace back to `1`, and from `1` back to the last
 
 ### Transparency & Blur
 
@@ -405,6 +438,9 @@ Low-memory preset:
     "previewMode": "live",
     "includeInactiveMonitorPreviews": true,
     "previewRecaptureDelayMs": 60,
+    "showSpecialWorkspaces": true,
+    "specialWorkspaces": [],
+    "specialWorkspaceColumns": 5,
     "effects": {
       "enableBackdrop": false,
       "backdropOpacity": 0.28,

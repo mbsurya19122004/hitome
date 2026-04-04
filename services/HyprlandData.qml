@@ -16,6 +16,7 @@ Singleton {
     property var addresses: []
     property var windowByAddress: ({})
     property var workspaces: []
+    property var allWorkspaces: []
     property var workspaceIds: []
     property var workspaceById: ({})
     property var activeWorkspace: null
@@ -182,6 +183,7 @@ Singleton {
             id: workspacesCollector
             onStreamFinished: {
                 const rawWorkspaces = JSON.parse(workspacesCollector.text);
+                root.allWorkspaces = rawWorkspaces;
                 root.workspaces = rawWorkspaces.filter(ws => ws.id >= 1 && ws.id <= 100);
                 let tempWorkspaceById = {};
                 for (var i = 0; i < root.workspaces.length; ++i) {
