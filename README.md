@@ -281,23 +281,26 @@ Increase `topMargin` to move the overview down. Decrease it to move up.
 {
   "overview": {
     "showSpecialWorkspaces": true,
-    "specialWorkspaces": ["communication", "music"],
+    "specialWorkspaces": ["stash", "music", "scratch"],
     "specialWorkspaceColumns": 5
   }
 }
 ```
 
 - `showSpecialWorkspaces`: renders special workspaces in a strip under the normal grid
-- `specialWorkspaces`: optional preconfigured special workspace names (without `special:` prefix)
+- `specialWorkspaces`: optional preconfigured special workspace names (without the `special:` prefix)
 - `specialWorkspaceColumns`: how many special tiles per row before wrapping
 
 Interaction behavior:
+- Preconfigured special workspaces appear in the overview even when they are empty
 - The special strip shows active special workspaces plus any names you preconfigure
+- This is useful for fixed workflows like `stash`, `music`, or `scratch`
 - Click a special tile to run `togglespecialworkspace <name>`
 - Click the `+` tile to create and open a new special workspace
 - Drag a window onto a special tile to move it with `movetoworkspacesilent special:<name>`
-- Drag a window onto the `+` tile to auto-create a new special workspace (`stash`, `stash-2`, ...), even when no special workspace is currently open
+- Drag a window onto the `+` tile to auto-create a new special workspace (`stash`, `stash-2`, ...), even when no special workspace is currently open or preconfigured
 - Special windows are visible directly in those tiles
+- Restart Quickshell after changing `config.json`, otherwise the special workspace list will not refresh immediately
 
 Normal workspace scrolling:
 - Scroll on the normal workspace grid to move the active workspace/highlighter across all normal workspaces
