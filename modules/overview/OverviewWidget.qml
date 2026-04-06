@@ -42,11 +42,14 @@ Item {
     property int windowZ: 1
     property int windowDraggingZ: 99999
     property real workspaceSpacing: Config.options.overview.workspaceSpacing
+    property string emptyWorkspaceWallpaperPath: Config.options.overview.emptyWorkspaceWallpaper
+    property string specialEmptyWorkspaceWallpaperPath: Config.options.overview.specialEmptyWorkspaceWallpaper
     property bool showSpecialWorkspaces: Config.options.overview.showSpecialWorkspaces
     property var configuredSpecialWorkspaces: Config.options.overview.specialWorkspaces ?? []
     property int specialWorkspaceColumns: Math.max(1, Config.options.overview.specialWorkspaceColumns)
     property real panelOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.panelOpacity))
     property real workspaceOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.workspaceOpacity))
+    property real emptyWorkspaceWallpaperOverlayOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.emptyWorkspaceWallpaperOverlayOpacity))
     property bool glassMode: Config.options.overview.effects.glassMode
     property real glassTintStrength: Math.max(0, Math.min(1, Config.options.overview.effects.glassTintStrength))
     property real glassBorderOpacity: Math.max(0, Math.min(1, Config.options.overview.effects.glassBorderOpacity))
@@ -117,6 +120,8 @@ Item {
     }
 
     readonly property bool hasSpecialWorkspaceSection: visibleSpecialWorkspaces.length > 0
+    readonly property bool hasEmptyWorkspaceWallpaper: `${emptyWorkspaceWallpaperPath ?? ""}`.trim().length > 0
+    readonly property bool hasSpecialEmptyWorkspaceWallpaper: `${specialEmptyWorkspaceWallpaperPath ?? ""}`.trim().length > 0
     readonly property string createSpecialWorkspaceTarget: "__create_special_workspace__"
     readonly property real specialWorkspaceTileHeight: root.workspaceImplicitHeight
     readonly property real specialStripGap: workspaceSpacing * 1.8
@@ -129,7 +134,7 @@ Item {
     readonly property int effectiveSpecialColumns: Math.max(1, Math.min(root.specialWorkspaceColumns, root.totalSpecialTiles))
     readonly property int specialWorkspaceRows: Math.ceil(root.totalSpecialTiles / root.effectiveSpecialColumns)
     readonly property real specialWorkspaceAspectCap: {
-        let maxAspect = 1;
+        let maxAspect = Math.max(1, root.workspaceImplicitWidth / Math.max(1, root.workspaceImplicitHeight));
         for (const name of visibleSpecialWorkspaces) {
             const geometry = root.specialWorkspaceGeometry(name, root.monitor?.id);
             const width = geometry?.width;
@@ -234,6 +239,31 @@ Item {
             index += 1;
 
         return `${base}-${index}`;
+    }
+
+    function wallpaperSource(path) {
+        const trimmed = `${path ?? ""}`.trim();
+        if (trimmed.length === 0)
+            return "";
+        if (trimmed.startsWith("file:/") || trimmed.startsWith("qrc:/") || trimmed.startsWith("image://") || trimmed.startsWith("http://") || trimmed.startsWith("https://"))
+            return trimmed;
+        if (trimmed.startsWith("/"))
+            return `file://${trimmed}`;
+        return trimmed;
+    }
+
+    function workspaceHasWindows(workspaceId) {
+        if (!Number.isFinite(workspaceId))
+            return false;
+
+        for (const addr in windowByAddress) {
+            const win = windowByAddress[addr];
+            if (root.isSpecialWorkspace(win))
+                continue;
+            if ((win?.workspace?.id ?? -1) === workspaceId)
+                return true;
+        }
+        return false;
     }
 
     function specialWindowZ(win) {
@@ -402,6 +432,7 @@ Item {
                             id: workspace
                             property int colIndex: index
                             property int workspaceValue: root.getWorkspaceInCell(rowIndex, colIndex)
+                            property bool showWallpaper: root.hasEmptyWorkspaceWallpaper
                             property color defaultWorkspaceColor: Appearance.colors.colLayer1
                             property color hoveredWorkspaceColor: ColorUtils.mix(defaultWorkspaceColor, Appearance.colors.colLayer1Hover, 0.1)
                             property color hoveredBorderColor: Appearance.colors.colLayer2Hover
@@ -409,7 +440,7 @@ Item {
 
                             implicitWidth: root.workspaceImplicitWidth
                             implicitHeight: root.workspaceImplicitHeight
-                            color: ColorUtils.applyAlpha(
+                            color: showWallpaper ? "transparent" : ColorUtils.applyAlpha(
                                 root.glassMode
                                     ? ColorUtils.mix(hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor, Appearance.colors.colLayer0, 0.46)
                                     : (hoveredWhileDragging ? hoveredWorkspaceColor : defaultWorkspaceColor),
@@ -420,6 +451,31 @@ Item {
                             border.color: hoveredWhileDragging
                                 ? ColorUtils.applyAlpha(hoveredBorderColor, root.glassMode ? root.glassBorderOpacity : 1)
                                 : "transparent"
+
+                            Image {
+                                visible: workspace.showWallpaper
+                                anchors.fill: parent
+                                source: root.wallpaperSource(root.emptyWorkspaceWallpaperPath)
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                                cache: true
+                                smooth: true
+                                mipmap: true
+                            }
+
+                            Rectangle {
+                                visible: workspace.showWallpaper
+                                anchors.fill: parent
+                                radius: parent.radius
+                                color: ColorUtils.applyAlpha(
+                                    root.glassMode
+                                        ? ColorUtils.mix(workspace.hoveredWhileDragging ? workspace.hoveredWorkspaceColor : workspace.defaultWorkspaceColor, Appearance.colors.colLayer0, 0.40)
+                                        : (workspace.hoveredWhileDragging ? workspace.hoveredWorkspaceColor : workspace.defaultWorkspaceColor),
+                                    workspace.hoveredWhileDragging
+                                        ? Math.min(0.28, root.emptyWorkspaceWallpaperOverlayOpacity + 0.08)
+                                        : root.emptyWorkspaceWallpaperOverlayOpacity
+                                )
+                            }
 
                             Rectangle {
                                 visible: root.glassMode
@@ -445,6 +501,7 @@ Item {
 
                             StyledText {
                                 anchors.centerIn: parent
+                                visible: !workspace.showWallpaper
                                 text: workspaceValue
                                 font {
                                     pixelSize: root.workspaceNumberSize * root.scale
@@ -554,6 +611,7 @@ Item {
                                     && Number.isFinite(specialGeometry?.height)
                                     && specialGeometry.width > 0
                                     && specialGeometry.height > 0
+                                property bool showWallpaper: root.hasSpecialEmptyWorkspaceWallpaper
                                 property real geometryWidth: hasRenderableGeometry ? specialGeometry.width : Math.max(1, root.workspaceImplicitWidth / root.scale)
                                 property real geometryHeight: hasRenderableGeometry ? specialGeometry.height : Math.max(1, root.workspaceImplicitHeight / root.scale)
                                 property real fitScale: hasRenderableGeometry ? Math.min(width / geometryWidth, height / geometryHeight) : root.scale
@@ -565,7 +623,7 @@ Item {
                                 implicitHeight: root.specialWorkspaceTileHeight
                                 radius: Appearance.rounding.screenRounding * root.scale
                                 clip: true
-                                color: ColorUtils.applyAlpha(
+                                color: showWallpaper ? "transparent" : ColorUtils.applyAlpha(
                                     root.glassMode
                                         ? ColorUtils.mix(baseColor, Appearance.colors.colLayer0, 0.44)
                                         : baseColor,
@@ -573,6 +631,29 @@ Item {
                                 )
                                 border.width: 1
                                 border.color: ColorUtils.applyAlpha(Appearance.colors.colLayer2Border, root.glassMode ? root.glassBorderOpacity : 0.75)
+
+                                Image {
+                                    visible: specialWorkspaceTile.showWallpaper
+                                    anchors.fill: parent
+                                    source: root.wallpaperSource(root.specialEmptyWorkspaceWallpaperPath)
+                                    fillMode: Image.PreserveAspectCrop
+                                    asynchronous: true
+                                    cache: true
+                                    smooth: true
+                                    mipmap: true
+                                }
+
+                                Rectangle {
+                                    visible: specialWorkspaceTile.showWallpaper
+                                    anchors.fill: parent
+                                    radius: parent.radius
+                                    color: ColorUtils.applyAlpha(
+                                        root.glassMode
+                                            ? ColorUtils.mix(specialWorkspaceTile.baseColor, Appearance.colors.colLayer0, 0.40)
+                                            : specialWorkspaceTile.baseColor,
+                                        root.emptyWorkspaceWallpaperOverlayOpacity
+                                    )
+                                }
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -746,10 +827,11 @@ Item {
                         }
                         Rectangle {
                             id: createSpecialWorkspaceTile
+                            property bool showWallpaper: root.hasSpecialEmptyWorkspaceWallpaper
                             implicitWidth: root.specialWorkspaceTileWidth
                             implicitHeight: root.specialWorkspaceTileHeight
                             radius: Appearance.rounding.screenRounding * root.scale
-                            color: ColorUtils.applyAlpha(
+                            color: showWallpaper ? "transparent" : ColorUtils.applyAlpha(
                                 root.glassMode
                                     ? ColorUtils.mix(Appearance.colors.colSecondaryContainer, Appearance.colors.colLayer1, 0.58)
                                     : ColorUtils.mix(Appearance.colors.colLayer2, Appearance.colors.colLayer1, 0.55),
@@ -759,6 +841,31 @@ Item {
                             border.color: root.draggingTargetSpecialWorkspace === root.createSpecialWorkspaceTarget
                                 ? ColorUtils.applyAlpha(root.activeBorderColor, 0.96)
                                 : ColorUtils.applyAlpha(Appearance.colors.colSecondary, 0.46)
+
+                            Image {
+                                visible: createSpecialWorkspaceTile.showWallpaper
+                                anchors.fill: parent
+                                source: root.wallpaperSource(root.specialEmptyWorkspaceWallpaperPath)
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                                cache: true
+                                smooth: true
+                                mipmap: true
+                            }
+
+                            Rectangle {
+                                visible: createSpecialWorkspaceTile.showWallpaper
+                                anchors.fill: parent
+                                radius: parent.radius
+                                color: ColorUtils.applyAlpha(
+                                    root.glassMode
+                                        ? ColorUtils.mix(Appearance.colors.colSecondaryContainer, Appearance.colors.colLayer0, 0.40)
+                                        : ColorUtils.mix(Appearance.colors.colLayer2, Appearance.colors.colLayer1, 0.55),
+                                    root.draggingTargetSpecialWorkspace === root.createSpecialWorkspaceTarget
+                                        ? Math.min(0.28, root.emptyWorkspaceWallpaperOverlayOpacity + 0.08)
+                                        : root.emptyWorkspaceWallpaperOverlayOpacity
+                                )
+                            }
 
                             Rectangle {
                                 anchors.fill: parent
@@ -775,6 +882,7 @@ Item {
 
                                 StyledText {
                                     anchors.horizontalCenter: parent.horizontalCenter
+                                    visible: !createSpecialWorkspaceTile.showWallpaper
                                     text: root.draggingTargetSpecialWorkspace === root.createSpecialWorkspaceTarget ? "Release" : "+"
                                     font.family: Appearance.font.family.expressive
                                     font.pixelSize: root.draggingTargetSpecialWorkspace === root.createSpecialWorkspaceTarget

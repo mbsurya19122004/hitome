@@ -190,11 +190,14 @@ Edit `~/.config/quickshell/overview/config.json`:
     "showSpecialWorkspaces": true,
     "specialWorkspaces": [],
     "specialWorkspaceColumns": 5,
+    "emptyWorkspaceWallpaper": "",
+    "specialEmptyWorkspaceWallpaper": "",
     "effects": {
       "enableBackdrop": false,
       "backdropOpacity": 0.28,
       "panelOpacity": 0.92,
       "workspaceOpacity": 0.86,
+      "emptyWorkspaceWallpaperOverlayOpacity": 0.18,
       "windowOverlayOpacity": 0.22,
       "enableBlur": false,
       "glassMode": false,
@@ -290,6 +293,8 @@ Increase `topMargin` to move the overview down. Decrease it to move up.
 - `showSpecialWorkspaces`: renders special workspaces in a strip under the normal grid
 - `specialWorkspaces`: optional preconfigured special workspace names (without the `special:` prefix)
 - `specialWorkspaceColumns`: how many special tiles per row before wrapping
+- `emptyWorkspaceWallpaper`: optional image path used as the background for normal workspace tiles
+- `specialEmptyWorkspaceWallpaper`: optional image path used as the background for special workspace tiles
 
 Interaction behavior:
 - Preconfigured special workspaces appear in the overview even when they are empty
@@ -306,6 +311,32 @@ Normal workspace scrolling:
 - Scroll on the normal workspace grid to move the active workspace/highlighter across all normal workspaces
 - Scrolling wraps from the last workspace back to `1`, and from `1` back to the last
 
+### Workspace Wallpaper
+
+```json
+{
+  "overview": {
+    "emptyWorkspaceWallpaper": "/home/your-user/Pictures/wallpaper.png",
+    "specialEmptyWorkspaceWallpaper": "/home/your-user/Pictures/special-wallpaper.png",
+    "effects": {
+      "emptyWorkspaceWallpaperOverlayOpacity": 0.12
+    }
+  }
+}
+```
+
+- Normal workspaces can use a wallpaper as their background
+- Special workspaces can use a different wallpaper as their background
+- The wallpaper remains visible behind floating or partially covered windows
+- If no special workspaces exist yet, that special wallpaper is also used for the `+` create tile
+- `emptyWorkspaceWallpaperOverlayOpacity` controls how much tint is applied over that wallpaper
+- Use an absolute path for the image for the most reliable behavior
+- Restart Quickshell after changing `config.json`, otherwise the wallpaper path will not refresh immediately
+
+Demo:
+
+![Workspace wallpaper demo](assets/Workspace_Wallpaper.png)
+
 ### Transparency & Blur
 
 ```json
@@ -316,6 +347,7 @@ Normal workspace scrolling:
       "backdropOpacity": 0.28,
       "panelOpacity": 0.92,
       "workspaceOpacity": 0.86,
+      "emptyWorkspaceWallpaperOverlayOpacity": 0.18,
       "windowOverlayOpacity": 0.22,
       "enableBlur": false,
       "glassMode": false,
@@ -331,6 +363,7 @@ Normal workspace scrolling:
 - `backdropOpacity`: opacity of backdrop dim layer (`0` to `1`)
 - `panelOpacity`: opacity of overview panel container (`0` to `1`)
 - `workspaceOpacity`: opacity of each workspace tile (`0` to `1`)
+- `emptyWorkspaceWallpaperOverlayOpacity`: tint strength over empty-workspace wallpaper (`0` to `1`)
 - `windowOverlayOpacity`: opacity of the color tint over window previews (`0` to `1`)
 - `enableBlur`: switches layer namespace to `quickshell:overview-blur`
 - `glassMode`: enables a glass-like tint + softer transparency preset for panel/workspaces/windows
@@ -348,6 +381,7 @@ Stronger glass preset:
       "enableBlur": true,
       "panelOpacity": 0.55,
       "workspaceOpacity": 0.48,
+      "emptyWorkspaceWallpaperOverlayOpacity": 0.10,
       "windowOverlayOpacity": 0.08,
       "glassMode": true,
       "glassTintStrength": 0.55,
@@ -444,11 +478,14 @@ Low-memory preset:
     "showSpecialWorkspaces": true,
     "specialWorkspaces": [],
     "specialWorkspaceColumns": 5,
+    "emptyWorkspaceWallpaper": "",
+    "specialEmptyWorkspaceWallpaper": "",
     "effects": {
       "enableBackdrop": false,
       "backdropOpacity": 0.28,
       "panelOpacity": 0.92,
       "workspaceOpacity": 0.86,
+      "emptyWorkspaceWallpaperOverlayOpacity": 0.18,
       "windowOverlayOpacity": 0.22,
       "enableBlur": false,
       "glassMode": false,
