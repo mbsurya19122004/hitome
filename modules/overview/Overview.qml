@@ -30,6 +30,17 @@ Scope {
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
             color: "transparent"
 
+            MouseArea {
+                anchors.fill: parent
+                z: 0   // behind your actual UI but above background if needed
+                enabled: GlobalStates.overviewOpen
+                hoverEnabled: false
+
+                onClicked: {
+                    GlobalStates.overviewOpen = false
+                }
+            }
+
             anchors {
                 top: true
                 bottom: true
@@ -95,6 +106,12 @@ Scope {
                         event.accepted = true;
                         return;
                     }
+
+                onActiveChanged: {
+                    if (!active) {
+                        GlobalStates.overviewOpen = false
+                    }
+                }
 
                     // Helper: compute current group bounds
                     const workspacesPerGroup = Config.options.overview.rows * Config.options.overview.columns;
