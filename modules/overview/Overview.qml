@@ -107,11 +107,7 @@ Scope {
                         return;
                     }
 
-                onActiveChanged: {
-                    if (!active) {
-                        GlobalStates.overviewOpen = false
-                    }
-                }
+                
 
                     // Helper: compute current group bounds
                     const workspacesPerGroup = Config.options.overview.rows * Config.options.overview.columns;
