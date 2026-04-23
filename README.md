@@ -1,8 +1,8 @@
-# Quickshell Overview for Hyprland
+# Hitome -  Quickshell Overview for Hyprland
 
 <div align="center">
 
-A standalone workspace overview module for Hyprland using Quickshell - shows all workspaces with live window previews, drag-and-drop support, and Super+Tab keybind.
+Custom fork of quickshell-overview
 
 ![Quickshell](https://img.shields.io/badge/Quickshell-0.2.0-blue?style=flat-square)
 ![Hyprland](https://img.shields.io/badge/Hyprland-Compatible-purple?style=flat-square)
@@ -17,10 +17,6 @@ A standalone workspace overview module for Hyprland using Quickshell - shows all
 ## 📸 Preview
 
 ![Overview Screenshot](assets/image.png)
-
-https://github.com/user-attachments/assets/e8f392d7-d831-4dec-9cd3-fb93d1ccc21c
-
-> *Workspace overview showing live window previews with drag-and-drop support*
 
 ---
 
@@ -39,31 +35,7 @@ https://github.com/user-attachments/assets/e8f392d7-d831-4dec-9cd3-fb93d1ccc21c
 
 ## 📦 Installation
 
-### Arch Linux (AUR)
 
-For Arch Linux users, you can install directly from the AUR:
-
-```bash
-# Using yay
-yay -S quickshell-overview-git
-
-# Using paru
-paru -S quickshell-overview-git
-```
-
-On AUR installs, module files are package-managed under:
-
-```text
-/etc/xdg/quickshell/overview/
-```
-
-Put your custom settings in:
-
-```text
-~/.config/quickshell/overview/config.json
-```
-
-Then add the keybind and auto-start to your Hyprland config (see Setup steps 2-4 below).
 
 ### Prerequisites
 
@@ -76,9 +48,8 @@ Then add the keybind and auto-start to your Hyprland config (see Setup steps 2-4
 1. **Install module files** (choose one):
    - **Git clone (manual install):**
    ```bash
-   git clone https://github.com/Shanu-Kumawat/quickshell-overview ~/.config/quickshell/overview
+   git clone https://github.com/mbsurya19122004/hitome ~/.config/quickshell/overview
    ```
-   - **AUR package:** use the command above (`yay -S quickshell-overview-git` or `paru -S ...`)
 
 2. **Add keybind** to your Hyprland config (`~/.config/hypr/hyprland.conf`):
    ```conf
@@ -99,27 +70,6 @@ Then add the keybind and auto-start to your Hyprland config (see Setup steps 2-4
 
 ```bash
 qs -c overview &
-```
-
-### NixOS
-
-For NixOS users, ensure Quickshell has access to required Qt6 modules:
-
-```nix
-# In your configuration.nix or home-manager config
-environment.systemPackages = with pkgs; [
-  quickshell
-  qt6.qtwayland
-];
-```
-
-If you're using home-manager:
-
-```nix
-home.packages = with pkgs; [
-  quickshell
-  qt6.qtwayland
-];
 ```
 
 ## 🎮 Usage
