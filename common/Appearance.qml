@@ -13,10 +13,10 @@ Singleton {
     property string caelestiaAccentProfile: Common.Config.options.appearance.caelestia.accentProfile
     property string lastCaelestiaPayload: ""
     property QtObject m3colors: {
-        if (colorSource === "matugen" && matugenLoader.item)
-            return matugenLoader.item;
-        if (colorSource === "caelestia" && caelestiaPaletteLoaded)
-            return caelestiaColors;
+        // if (colorSource === "matugen" && matugenLoader.item)
+        //     return matugenLoader.item;
+        // if (colorSource === "caelestia" && caelestiaPaletteLoaded)
+        //     return caelestiaColors;
         return defaultColors;
     }
     property QtObject animation
@@ -35,28 +35,37 @@ Singleton {
 
     property QtObject defaultColors: QtObject {
         property bool darkmode: true
-        property color m3primary: "#E5B6F2"
-        property color m3onPrimary: "#452152"
-        property color m3primaryContainer: "#5D386A"
-        property color m3onPrimaryContainer: "#F9D8FF"
-        property color m3secondary: "#D5C0D7"
-        property color m3onSecondary: "#392C3D"
-        property color m3secondaryContainer: "#534457"
-        property color m3onSecondaryContainer: "#F2DCF3"
-        property color m3background: "#161217"
-        property color m3onBackground: "#EAE0E7"
-        property color m3surface: "#161217"
-        property color m3surfaceContainerLow: "#1F1A1F"
-        property color m3surfaceContainer: "#231E23"
-        property color m3surfaceContainerHigh: "#2D282E"
-        property color m3surfaceContainerHighest: "#383339"
-        property color m3onSurface: "#EAE0E7"
-        property color m3surfaceVariant: "#4C444D"
-        property color m3onSurfaceVariant: "#CFC3CD"
-        property color m3inverseSurface: "#EAE0E7"
-        property color m3inverseOnSurface: "#342F34"
-        property color m3outline: "#988E97"
-        property color m3outlineVariant: "#4C444D"
+
+        property color m3primary: "#24BD5C"
+        property color m3onPrimary: "#091f11"
+        property color m3primaryContainer: "#0f1210"
+        property color m3onPrimaryContainer: "#24BD5C"
+
+        property color m3secondary: "#24BD5C"
+        property color m3onSecondary: "#043a14"
+        property color m3secondaryContainer: "#0f1210"
+        property color m3onSecondaryContainer: "#F4F3F5"
+
+        property color m3background: "#23262D"
+        property color m3onBackground: "#F5F5F6"
+
+        property color m3surface: "#050505"
+        property color m3surfaceContainerLow: "#0a0a0b"
+        property color m3surfaceContainer: "#0a0a0b"
+        property color m3surfaceContainerHigh: "#050505"
+        property color m3surfaceContainerHighest: "#0f1210"
+
+        property color m3onSurface: "#F5F5F6"
+
+        property color m3surfaceVariant: "#0a0a0b"
+        property color m3onSurfaceVariant: "#c9c9c9"
+
+        property color m3inverseSurface: "#0a0a0b"
+        property color m3inverseOnSurface: "#ACACAC"
+
+        property color m3outline: "#838383"
+        property color m3outlineVariant: "#1E1E25"
+
         property color m3shadow: "#000000"
     }
 
